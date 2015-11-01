@@ -24,7 +24,7 @@ namespace HealthKitService.Controllers
         [HttpGet]
         public IQueryable<User> GetUsers()
         {
-            return db.Users;   
+            return db.Users;
         }
 
         /// <summary>
