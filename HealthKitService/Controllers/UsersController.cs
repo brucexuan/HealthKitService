@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using HealthKitService.Models;
+using System.Text;
+using System.IO;
 
 namespace HealthKitService.Controllers
 {
@@ -17,13 +19,18 @@ namespace HealthKitService.Controllers
     {
         private HealthKitServiceContext db = new HealthKitServiceContext();
 
+        public static string PostUrl = "http://106.ihuyi.cn/webservice/sms.php?method=Submit";
+        public static string username = "cf_steven";
+        public static string password = "123456789a!";
+      
+
         /// <summary>
         /// Gets all users
         /// </summary>
         /// <returns></returns>
         [HttpGet]
         public IQueryable<User> GetUsers()
-        {
+        {   
             return db.Users;
         }
 
@@ -139,6 +146,34 @@ namespace HealthKitService.Controllers
         private bool UserExists(int id)
         {
             return db.Users.Count(e => e.Id == id) > 0;
+        }
+
+        private bool SendSms(string username, string password, string mobile, string validationCode)
+        {
+            string postStrTpl = "account={0}&password={1}&mobile={2}&content={3}";
+            UTF8Encoding encoding = new UTF8Encoding();
+            byte[] postData = encoding.GetBytes(string.Format(postStrTpl, username, password, mobile, "您的验证码是：" + validationCode + " 。请不要把验证码泄露给其他人。"));
+
+            HttpWebRequest myRequest = (HttpWebRequest)WebRequest.Create(PostUrl);
+            myRequest.Method = "POST";
+            myRequest.ContentType = "application/x-www-form-urlencoded";
+            myRequest.ContentLength = postData.Length;
+
+            Stream newStream = myRequest.GetRequestStream();
+            // Send the data.
+            newStream.Write(postData, 0, postData.Length);
+            newStream.Flush();
+            newStream.Close();
+
+            HttpWebResponse myResponse = (HttpWebResponse)myRequest.GetResponse();
+            HttpStatusCode code = myResponse.StatusCode;
+            if (code != HttpStatusCode.OK)
+            {
+                return false;
+            }
+            return true;
+            //StreamReader reader = new StreamReader(myResponse.GetResponseStream(), Encoding.UTF8);
+            //string res = reader.ReadToEnd();
         }
     }
 }

@@ -1,0 +1,17 @@
+﻿1. 验证码
+2. 图片上传
+
+Enable-Migrations
+Add-Migration Initial
+Update-Database
+
+
+
+http://www.ihuyi.com/product.php?cid=33
+短信验证码平台
+
+cf_steven
+123456789a!
+
+
+http://localhost:2357/api/Users
